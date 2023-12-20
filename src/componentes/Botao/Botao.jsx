@@ -14,6 +14,10 @@ const Botao = styled.button`
     white-space: nowrap;
     width: ${props => props.$fluido ? '100%' : 'auto'};
     cursor: pointer;
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
 `
 
 export default Botao

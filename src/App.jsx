@@ -7,6 +7,8 @@ import MensagemSucesso from "./componentes/MensagemSucesso/MensagemSucesso"
 import Botao from "./componentes/Botao/Botao"
 import Rodape from "./componentes/Rodape/Rodape"
 import Captura from "./componentes/Captura/Captura"
+import { useEffect, useState } from "react"
+import { useGeolocated } from "react-geolocated";
 
 const Container = styled.section`
   width: 390px;
@@ -34,6 +36,39 @@ const Container = styled.section`
 
 function App() {
 
+  useEffect(() => {
+    console.log('app foi montado')
+  }, [])
+
+  const [sucesso, setSucesso] = useState(false)
+  const [fotoCliente, setFotoCliente] = useState(null)
+  const { coords, isGeolocationAvailable, isGeolocationEnabled } =
+    useGeolocated({
+      positionOptions: {
+        enableHighAccuracy: false,
+      },
+      userDecisionTimeout: 5000,
+    });
+
+  const aoObterImagem = (imagem) => {
+    setFotoCliente(imagem)
+  }
+
+  const submeterFormulario = (evento) => {
+    evento.preventDefault()
+
+    const dadosCliente = {
+      fotoCliente,
+    } 
+    
+    if (isGeolocationAvailable && isGeolocationEnabled) {
+      dadosCliente.geolocalizacao = coords
+    }
+
+    console.log('dados', dadosCliente)
+    setSucesso(true)
+  }
+
   return (
     <>
       <EstilosGlobais />
@@ -44,12 +79,13 @@ function App() {
         <h2>
           Reconhecimento facial
         </h2>
-        <Captura />
-        <MensagemSucesso />
-
-        <Botao $fluido>
+        <Captura aoObterImagem={aoObterImagem}/>
+        {sucesso && <MensagemSucesso />}
+        <form onSubmit={submeterFormulario}>
+          <Botao $fluido disabled={!fotoCliente}>
             Quero abrir minha conta!
-        </Botao>
+          </Botao>
+        </form>
       </Container>
       <Rodape />
     </>
